@@ -17,7 +17,6 @@ db.serialize(() => {
         price REAL NOT NULL,
         brand TEXT NOT NULL,
         type TEXT NOT NULL,
-        stock INTEGER NOT NULL,
         imageURL TEXT
     )`);
 
@@ -26,7 +25,6 @@ db.serialize(() => {
         firstName TEXT NOT NULL,
         lastName TEXT NOT NULL,
         email TEXT NOT NULL,
-        password TEXT NOT NULL,
         address TEXT
     )`);
 

@@ -28,12 +28,12 @@ exports.fetchComponentById = async (id) => {
 
 // Ajouter un nouveau composant
 exports.addComponent = async (component) => {
-    const { name, description, price, brand, type, stock, imageURL } = component;
+    const { name, description, price, brand, type, imageURL } = component;
     return new Promise((resolve, reject) => {
         db.run(
-            `INSERT INTO COMPONENT (name, description, price, brand, type, stock, imageURL)
+            `INSERT INTO COMPONENT (name, description, price, brand, type, imageURL)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [name, description, price, brand, type, stock, imageURL],
+            [name, description, price, brand, type, imageURL],
             function (err) {
                 if (err) {
                     reject(err);
@@ -47,13 +47,13 @@ exports.addComponent = async (component) => {
 
 // Mettre à jour un composant existant
 exports.updateComponent = async (id, updatedData) => {
-    const { name, description, price, brand, type, stock, imageURL } = updatedData;
+    const { name, description, price, brand, type, imageURL } = updatedData;
     return new Promise((resolve, reject) => {
         db.run(
             `UPDATE COMPONENT
-             SET name = ?, description = ?, price = ?, brand = ?, type = ?, stock = ?, imageURL = ?
+             SET name = ?, description = ?, price = ?, brand = ?, type = ?, imageURL = ?
              WHERE idComponent = ?`,
-            [name, description, price, brand, type, stock, imageURL, id],
+            [name, description, price, brand, type, imageURL, id],
             (err) => {
                 if (err) {
                     reject(err);
