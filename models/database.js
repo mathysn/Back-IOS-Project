@@ -35,9 +35,8 @@ db.serialize(() => {
 
     db.run(`CREATE TABLE IF NOT EXISTS 'ORDER' (
         idOrder INTEGER PRIMARY KEY AUTOINCREMENT,
-        dateOrder TEXT NOT NULL,
-        totalPrice REAL NOT NULL,
         idClient INTEGER,
+        dateOrder TEXT NOT NULL,
         FOREIGN KEY (idClient) REFERENCES CLIENT (idClient)
     )`);
 

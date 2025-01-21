@@ -3,32 +3,13 @@ const db = require('../models/database');
 exports.addOrder = async ({ idClient, orderLines }) => {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            let totalPrice = 0;
-
-            const stmt = db.prepare(
-                `SELECT price FROM COMPONENT WHERE idComponent = ?`
-            );
-
-            // Calculer le prix total
-            orderLines.forEach((line) => {
-                stmt.get([line.idComponent], (err, row) => {
-                    if (err) {
-                        reject(err);
-                    } else if (!row) {
-                        reject(new Error(`Component with id ${line.idComponent} not found`));
-                    } else {
-                        totalPrice += row.price * line.quantity;
-                    }
-                });
-            });
-
             stmt.finalize(() => {
                 const dateOrder = new Date().toISOString(); // Date de création dynamique
 
                 // Insérer la commande après avoir calculé le prix total
                 db.run(
-                    `INSERT INTO 'ORDER' (dateOrder, totalPrice, idClient) VALUES (?, ?, ?)`,
-                    [dateOrder, totalPrice, idClient],
+                    `INSERT INTO 'ORDER' (idClient, dateOrder) VALUES (?, ?)`,
+                    [idClient, dateOrder],
                     function (err) {
                         if (err) {
                             reject(err);
@@ -56,7 +37,7 @@ exports.addOrder = async ({ idClient, orderLines }) => {
 exports.fetchOrdersByClientId = async (clientId) => {
     return new Promise((resolve, reject) => {
         db.all(
-            `SELECT o.idOrder, o.dateOrder, o.totalPrice, ol.idComponent, ol.quantity
+            `SELECT o.idOrder, o.dateOrder, ol.idComponent, ol.quantity
              FROM 'ORDER' o
              JOIN ORDER_LINE ol ON o.idOrder = ol.idOrder
              WHERE o.idClient = ?`,
