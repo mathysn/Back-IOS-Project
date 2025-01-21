@@ -27,32 +27,35 @@ exports.fetchComponentById = async (id) => {
 };
 
 // Ajouter un nouveau composant
-exports.addComponent = async (component) => {
-    const { name, description, price, brand, type, imageURL } = component;
+exports.createComponent = async ({ name, description, price, brand, type, imageURL }) => {
     return new Promise((resolve, reject) => {
         db.run(
-            `INSERT INTO COMPONENT (name, description, price, brand, type, imageURL)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO COMPONENT (name, description, price, brand, type, imageURL) VALUES (?, ?, ?, ?, ?, ?)`,
             [name, description, price, brand, type, imageURL],
             function (err) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(this.lastID); // Retourne l'ID du composant ajouté
+                    resolve({
+                        idComponent: this.lastID,
+                        name,
+                        description,
+                        price,
+                        brand,
+                        type,
+                        imageURL
+                    });
                 }
             }
         );
     });
 };
 
-// Mettre à jour un composant existant
-exports.updateComponent = async (id, updatedData) => {
-    const { name, description, price, brand, type, imageURL } = updatedData;
+// Mettre à jour un composant
+exports.updateComponent = async (id, { name, description, price, brand, type, imageURL }) => {
     return new Promise((resolve, reject) => {
         db.run(
-            `UPDATE COMPONENT
-             SET name = ?, description = ?, price = ?, brand = ?, type = ?, imageURL = ?
-             WHERE idComponent = ?`,
+            `UPDATE COMPONENT SET name = ?, description = ?, price = ?, brand = ?, type = ?, imageURL = ? WHERE idComponent = ?`,
             [name, description, price, brand, type, imageURL, id],
             (err) => {
                 if (err) {
@@ -66,9 +69,9 @@ exports.updateComponent = async (id, updatedData) => {
 };
 
 // Supprimer un composant
-exports.deleteComponent = async (id) => {
+exports.removeComponent = async (id) => {
     return new Promise((resolve, reject) => {
-        db.run('DELETE FROM COMPONENT WHERE idComponent = ?', [id], (err) => {
+        db.run(`DELETE FROM COMPONENT WHERE idComponent = ?`, [id], (err) => {
             if (err) {
                 reject(err);
             } else {

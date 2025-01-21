@@ -1,4 +1,4 @@
-const { fetchComponents, fetchComponentById } = require('../services/component.service');
+const { fetchComponents, fetchComponentById, createComponent, updateComponent, removeComponent } = require('../services/component.service');
 
 exports.getComponents = async (req, res) => {
     try {
@@ -17,6 +17,33 @@ exports.getComponentById = async (req, res) => {
         } else {
             res.status(200).json(component);
         }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.addComponent = async (req, res) => {
+    try {
+        const newComponent = await createComponent(req.body);
+        res.status(201).json({ message: 'Component added successfully', component: newComponent });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.editComponent = async (req, res) => {
+    try {
+        await updateComponent(req.params.id, req.body);
+        res.status(200).json({ message: 'Component updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.deleteComponent = async (req, res) => {
+    try {
+        await removeComponent(req.params.id);
+        res.status(200).json({ message: 'Component deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

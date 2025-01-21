@@ -14,10 +14,10 @@ exports.fetchClientById = async (id) => {
 
 exports.modifyClient = async (id, data) => {
     return new Promise((resolve, reject) => {
-        const { firstName, lastName, email, address } = data;
+        const { firstName, lastName, address } = data;
         db.run(
-            `UPDATE CLIENT SET firstName = ?, lastName = ?, email = ?, address = ? WHERE idClient = ?`,
-            [firstName, lastName, email, address, id],
+            `UPDATE CLIENT SET firstName = ?, lastName = ?, address = ? WHERE idClient = ?`,
+            [firstName, lastName, address, id],
             (err) => {
                 if (err) {
                     reject(err);
