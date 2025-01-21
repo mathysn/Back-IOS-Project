@@ -3,6 +3,25 @@ const db = require('../models/database');
 exports.addOrder = async ({ idClient, orderLines }) => {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
+            let totalPrice = 0;
+
+            const stmt = db.prepare(
+                `SELECT price FROM COMPONENT WHERE idComponent = ?`
+            );
+
+            // Calculer le prix total
+            orderLines.forEach((line) => {
+                stmt.get([line.idComponent], (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else if (!row) {
+                        reject(new Error(`Component with id ${line.idComponent} not found`));
+                    } else {
+                        totalPrice += row.price * line.quantity;
+                    }
+                });
+            });
+
             stmt.finalize(() => {
                 const dateOrder = new Date().toISOString(); // Date de création dynamique
 
@@ -53,32 +72,22 @@ exports.fetchOrdersByClientId = async (clientId) => {
     });
 };
 
-exports.modifyOrder = async (id, { dateOrder, totalPrice, orderLines }) => {
+exports.modifyOrder = async (id, { orderLines }) => {
     return new Promise((resolve, reject) => {
-        db.run(
-            `UPDATE 'ORDER' SET dateOrder = ?, totalPrice = ? WHERE idOrder = ?`,
-            [dateOrder, totalPrice, id],
-            function (err) {
-                if (err) {
-                    reject(err);
-                } else {
-                    db.run(`DELETE FROM ORDER_LINE WHERE idOrder = ?`, [id], (err) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            const stmt = db.prepare(
-                                `INSERT INTO ORDER_LINE (idOrder, idComponent, quantity) VALUES (?, ?, ?)`
-                            );
-                            for (const line of orderLines) {
-                                stmt.run(id, line.idComponent, line.quantity);
-                            }
-                            stmt.finalize();
-                            resolve();
-                        }
-                    });
+        db.run(`DELETE FROM ORDER_LINE WHERE idOrder = ?`, [id], (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                const stmt = db.prepare(
+                    `INSERT INTO ORDER_LINE (idOrder, idComponent, quantity) VALUES (?, ?, ?)`
+                );
+                for (const line of orderLines) {
+                    stmt.run(id, line.idComponent, line.quantity);
                 }
+                stmt.finalize();
+                resolve();
             }
-        );
+        });
     });
 };
 
