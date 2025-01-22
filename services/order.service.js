@@ -72,6 +72,35 @@ exports.fetchOrdersByClientId = async (clientId) => {
     });
 };
 
+exports.fetchOrderById = async (orderId) => {
+    return new Promise((resolve, reject) => {
+        db.all(
+            `SELECT o.idOrder, o.dateOrder, ol.idComponent, ol.quantity
+             FROM 'ORDER' o
+             JOIN ORDER_LINE ol ON o.idOrder = ol.idOrder
+             WHERE o.idOrder = ?`,
+            [orderId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length === 0) {
+                    resolve(null);
+                } else {
+                    const orderDetails = {
+                        idOrder: rows[0].idOrder,
+                        dateOrder: rows[0].dateOrder,
+                        orderLines: rows.map(row => ({
+                            idComponent: row.idComponent,
+                            quantity: row.quantity
+                        }))
+                    };
+                    resolve(orderDetails);
+                }
+            }
+        );
+    });
+};
+
 exports.modifyOrder = async (id, { orderLines }) => {
     return new Promise((resolve, reject) => {
         db.run(`DELETE FROM ORDER_LINE WHERE idOrder = ?`, [id], (err) => {
@@ -106,5 +135,23 @@ exports.removeOrder = async (id) => {
                 });
             }
         });
+    });
+};
+
+exports.fetchOrderSummaryByClientId = async (clientId) => {
+    return new Promise((resolve, reject) => {
+        db.all(
+            `SELECT o.idOrder, o.idClient, o.dateOrder
+             FROM 'ORDER' o
+             WHERE o.idClient = ?`,
+            [clientId],
+            (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            }
+        );
     });
 };

@@ -1,0 +1,383 @@
+openapi: 3.0.0
+info:
+  title: UberIT API
+  version: 1.0.0
+  description: Swagger pour tester l'API de UberIT
+servers:
+  - url: http://192.168.235.179:3000/api
+  - url: http://localhost:3000/api
+
+paths:
+  /auth/register:
+    post:
+      summary: Enregistrer un nouveau client
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '201':
+          description: Client enregistré avec succès
+        '400':
+          description: Email déjà enregistré
+        '500':
+          description: Erreur serveur
+
+  /auth/login:
+    post:
+      summary: Authentification d'un client
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Connexion réussie
+        '404':
+          description: Client non trouvé
+        '500':
+          description: Erreur serveur
+
+  /client/{id}:
+    get:
+      summary: Récupérer un client par ID
+      tags:
+        - Client
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails du client
+        '404':
+          description: Client non trouvé
+        '500':
+          description: Erreur serveur
+
+    put:
+      summary: Mettre à jour un client par ID
+      tags:
+        - Client
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '200':
+          description: Client mis à jour avec succès
+        '500':
+          description: Erreur serveur
+
+  /component:
+    get:
+      summary: Récupérer tous les composants
+      tags:
+        - Component
+      responses:
+        '200':
+          description: Liste des composants
+        '500':
+          description: Erreur serveur
+
+    post:
+      summary: Ajouter un nouveau composant
+      tags:
+        - Component
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                brand:
+                  type: string
+                type:
+                  type: string
+                imageURL:
+                  type: string
+      responses:
+        '201':
+          description: Composant ajouté avec succès
+        '500':
+          description: Erreur serveur
+
+  /component/{id}:
+    get:
+      summary: Récupérer un composant par ID
+      tags:
+        - Component
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails du composant
+        '404':
+          description: Composant non trouvé
+        '500':
+          description: Erreur serveur
+
+    put:
+      summary: Mettre à jour un composant
+      tags:
+        - Component
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                brand:
+                  type: string
+                type:
+                  type: string
+                imageURL:
+                  type: string
+      responses:
+        '200':
+          description: Composant mis à jour avec succès
+        '500':
+          description: Erreur serveur
+
+    delete:
+      summary: Supprimer un composant
+      tags:
+        - Component
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Composant supprimé avec succès
+        '500':
+          description: Erreur serveur
+
+  /order:
+    post:
+      summary: Créer une nouvelle commande
+      tags:
+        - Order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idClient:
+                  type: integer
+                orderLines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      idComponent:
+                        type: integer
+                      quantity:
+                        type: integer
+      responses:
+        '201':
+          description: Commande créée avec succès
+        '500':
+          description: Erreur serveur
+
+  /order/client/{clientId}:
+    get:
+      summary: Récupérer les commandes d'un client
+      tags:
+        - Order
+      parameters:
+        - in: path
+          name: clientId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des commandes
+        '500':
+          description: Erreur serveur
+
+  /order/edit/{id}:
+    put:
+      summary: Mettre à jour une commande
+      tags:
+        - Order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderLines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      idComponent:
+                        type: integer
+                      quantity:
+                        type: integer
+      responses:
+        '200':
+          description: Commande mise à jour avec succès
+        '500':
+          description: Erreur serveur
+  /order/delete/{id}:
+    delete:
+      summary: Supprimer une commande
+      tags:
+        - Order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Commande supprimée avec succès
+        '500':
+          description: Erreur serveur
+  /order/{id}:
+    get:
+      summary: Récupérer une commande par ID
+      tags:
+        - Order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails de la commande
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idOrder:
+                    type: integer
+                  dateOrder:
+                    type: string
+                  orderLines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        idComponent:
+                          type: integer
+                        quantity:
+                          type: integer
+        '404':
+          description: Commande non trouvée
+        '500':
+          description: Erreur serveur
+  /order/summary/client/{clientId}:
+    get:
+      summary: Récupérer le résumé des commandes d'un client
+      tags:
+        - Order
+      parameters:
+        - in: path
+          name: clientId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des commandes du client
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idOrder:
+                      type: integer
+                      description: ID de la commande
+                    idClient:
+                      type: integer
+                      description: ID du client ayant passé la commande
+                    dateOrder:
+                      type: string
+                      format: date-time
+                      description: Date de la commande
+        '404':
+          description: Aucun résultat trouvé pour le client
+        '500':
+          description: Erreur serveur
